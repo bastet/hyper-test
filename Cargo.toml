@@ -2,3 +2,7 @@
 name = "hyper-test"
 version = "0.1.0"
 authors = ["Martin Evans <martindevans@gmail.com>"]
+
+[dependencies.hyper]
+version = "*"
+default-features = false
