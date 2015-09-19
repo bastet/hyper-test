@@ -130,18 +130,67 @@ mod testing
     }
     
     #[test]
-    fn construct_request() {
-        let mut stream = MockStream::with_input(b"\
+    fn test_get_empty_body() {
+        let mut mock = MockStream::with_input(b"\
             GET / HTTP/1.1\r\n\
             Host: example.domain\r\n\
             \r\n\
             I'm a bad request.\r\n\
         ");
-        let stream: &mut NetworkStream = &mut stream;
-        let mut reader = BufReader::new(stream);
 
-        let req = Request::new(&mut reader, SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::new(0u8,0u8,0u8,0u8), 0u16))).unwrap();
-        
+        let mock: &mut NetworkStream = &mut mock;
+        let mut stream = BufReader::new(mock);
+
+        let req = Request::new(&mut stream, SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::new(0u8,0u8,0u8,0u8), 0u16))).unwrap();
         assert_eq!(read_to_string(req).unwrap(), "".to_owned());
+    }
+
+    #[test]
+    fn test_head_empty_body() {
+        let mut mock = MockStream::with_input(b"\
+            HEAD / HTTP/1.1\r\n\
+            Host: example.domain\r\n\
+            \r\n\
+            I'm a bad request.\r\n\
+        ");
+
+        let mock: &mut NetworkStream = &mut mock;
+        let mut stream = BufReader::new(mock);
+
+        let req = Request::new(&mut stream, SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::new(0u8,0u8,0u8,0u8), 0u16))).unwrap();
+        assert_eq!(read_to_string(req).unwrap(), "".to_owned());
+    }
+
+    #[test]
+    fn test_post_empty_body() {
+        let mut mock = MockStream::with_input(b"\
+            POST / HTTP/1.1\r\n\
+            Host: example.domain\r\n\
+            \r\n\
+            I'm a bad request.\r\n\
+        ");
+
+        let mock: &mut NetworkStream = &mut mock;
+        let mut stream = BufReader::new(mock);
+
+        let req = Request::new(&mut stream, SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::new(0u8,0u8,0u8,0u8), 0u16))).unwrap();
+        assert_eq!(read_to_string(req).unwrap(), "".to_owned());
+    }
+    
+    #[test]
+    fn test_post_body() {
+        let mut mock = MockStream::with_input(b"\
+            POST / HTTP/1.1\r\n\
+            Host: example.domain\r\n\
+            Content-Length: 18\r\n\
+            \r\n\
+            I'm a bad request.\r\n\
+        ");
+
+        let mock: &mut NetworkStream = &mut mock;
+        let mut stream = BufReader::new(mock);
+
+        let req = Request::new(&mut stream, SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::new(0u8,0u8,0u8,0u8), 0u16))).unwrap();
+        assert_eq!(read_to_string(req).unwrap(), "I'm a bad request.".to_owned());
     }
 }
